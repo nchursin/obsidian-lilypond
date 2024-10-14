@@ -21,7 +21,7 @@ export const render = async function (
 	fs.closeSync(lyFile.fd);
 
 	const lyFileDir = path.join(lyFile.path, "..");
-	exec(`${lilypondPath} -dbackend=svg -fsvg --silent --output=${lyFileDir} ${lyFile.path}`)
+	exec(`${lilypondPath} -dbackend=svg -dpoint-and-click=false -fsvg --silent --output=${lyFileDir} ${lyFile.path}`)
 	.then(() => {
 		const outputPath = lyFile.path.substring(0, lyFile.path.lastIndexOf(".ly")).concat(".svg");
 		el.innerHTML = fs.readFileSync(outputPath, {encoding: "utf8", flag: "r"});
