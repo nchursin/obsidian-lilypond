@@ -23,17 +23,26 @@ export const render = async function (
 	const lyFileDir = path.join(lyFile.path, "..");
 	try {
 		await exec(`${lilypondPath} -dbackend=svg -dpoint-and-click=false -fsvg --silent --output=${lyFileDir} ${lyFile.path}`)
-		sleep(1)
+
 		const outputPaths = collectFiles(lyFile.path)
-		const html = outputPaths
-			.map((path) => fs.readFileSync(path, { encoding: "utf8", flag: "r" }))
-			.join("<br/><br/>")
-		el.innerHTML = html
+
+		const htmls = await renderSvgs(outputPaths)
+
+		el.innerHTML = htmls.join("<br/><br/>")
 	} catch (error) {
 		console.error(error);
 		renderError(error, el)
 	}
 };
+
+const renderSvgs = async (files: string[]): Promise<string[]> => {
+	const htmls = await Promise.all(
+		files.map(
+			(path) => fs.promises.readFile(path, { encoding: "utf8", flag: "r" }),
+		),
+	)
+	return htmls
+}
 
 const collectFiles = (lyFilePath: string): string[] => {
 	const fileNameNoExt = path.join(path.dirname(lyFilePath), path.basename(lyFilePath, '.ly'))
